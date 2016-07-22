@@ -2,7 +2,8 @@
 
 A Ruby client library for Google Play Services OAuth
 
-A port of the Python library [gpsoauth](https://github.com/simon-weber/gpsoauth)
+A port of the Python library [gpsoauth](https://github.com/simon-weber/gpsoauth) by [Simon Weber](https://github.com/simon-weber)
+
 ## Installation
 
 Add this line to your application's Gemfile:
