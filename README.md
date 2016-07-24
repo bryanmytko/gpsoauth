@@ -24,7 +24,21 @@ And then execute:
 
 ## Usage
 
-TODO
+Instantiate a Gpsoauth connection:
+
+    g = Gpsoauth::Connection.new
+
+Perform 'master login'. This requires an Android ID:
+
+    response = g.master_login('your-email@gmail.com', 'your-password', 'android id')
+
+Use the response's token to perform the OAuth:
+
+    oauth_response = g.oauth(... // @TODO
+
+Access response Auth token via:
+
+    oauth_response["Auth"]
 
 ## Contributing
 
