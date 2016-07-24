@@ -13,13 +13,15 @@ module Gpsoauth
                      service = nil, device_country = nil,
                      operator_country = nil, lang = nil, sdk_version = nil)
 
-      android_id = "9774d56d682e549c" # @TODO Remove, client provided
-      service = service || "ac2dm"
-      device_country = device_country || "us"
-      operator_country = operator_country || "us"
-      lang = lang || "en"
-      sdk_version = sdk_version || 17
+      @email = email
+      @service = service || "ac2dm"
 
+      @device_country = device_country || "us"
+      @operator_country = operator_country || "us"
+      @lang = lang || "en"
+      @sdk_version = sdk_version || 17
+
+      @android_id = "9774d56d682e549c" # @TODO Remove, client provided
       android_key = Google::key_from_b64(B64_KEY_7_3_29)
 
       data = {
@@ -41,7 +43,8 @@ module Gpsoauth
       auth_request(data)
     end
 
-    def oauth
+    def oauth(master_token, service, app, client_signature)
+      # @TODO
     end
 
     private
