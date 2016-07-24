@@ -18,9 +18,9 @@ And then execute:
 
     $ bundle
 
-    Or install it yourself as:
+Or install it yourself as:
 
-        $ gem install gpsoauth
+    $ gem install gpsoauth
 
 ## Usage
 
