@@ -12,8 +12,7 @@ module Gpsoauth
     def initialize(android_id, service = nil, device_country = nil,
                    operator_country = nil, lang = nil, sdk_version = nil)
 
-      @android_id = "9774d56d682e549c" # @TODO Remove, client provided
-      # @android_id = android_id
+      @android_id = android_id
 
       @service = service || "ac2dm"
       @device_country = device_country || "us"
@@ -30,8 +29,9 @@ module Gpsoauth
         Email: email,
         has_permission: 1,
         add_account: 1,
+        # @TODO Finish password encryption
+        # EncryptedPasswd: Google::signature(email, password, android_key)
         Passwd: password,
-        # EncryptedPasswd: Google::signature(email, password, android_key), # @TODO
         service: @service,
         source: "android",
         androidId: @android_id,
