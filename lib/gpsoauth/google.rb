@@ -21,6 +21,9 @@ module Gpsoauth
       struct = key_to_struct(key)
       signature.push Digest::SHA1.hexdigest(struct)[0,4]
 
+      # @TODO Encryptedpasswd notes:
+      # http://codedigging.com/blog/2014-06-09-about-encryptedpasswd/
+      #
       # cipher = PKCS1_OAEP.new(key)
       # encrypted_login = cipher.encrypt((email + u'\x00' + password).encode('utf-8'))
       # signature.extend(encrypted_login)
@@ -30,7 +33,6 @@ module Gpsoauth
     private
 
     def self.key_to_struct(key)
-      # @TODO double check format
       mod = key.n.to_s.bytes.map{ |x| x.to_s(16) }.join
       exponent = key.e.to_s.bytes.map{ |x| x.to_s(16) }.join
 
