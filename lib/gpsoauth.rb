@@ -1,5 +1,4 @@
 require "httparty"
-require "byebug"
 require "base64"
 
 require "gpsoauth/connection"
