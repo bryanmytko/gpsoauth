@@ -1,7 +1,7 @@
 module Gpsoauth
   class Connection
     AUTH_URL = "https://android.clients.google.com/auth"
-    USER_AGENT = "gpsoauth/#{VERSION}"
+    USER_AGENT = "gpsoauth/gpsoauth"
 
     # The key is distirbuted with Google Play Services.
     # This one is from version 7.3.29.
@@ -68,7 +68,7 @@ module Gpsoauth
 
     def auth_request(data)
       options = {
-        body: data.stringify_keys,
+        body: data,
         headers: {
           "User-Agent" => USER_AGENT,
           "Accept-Encoding" => ""
