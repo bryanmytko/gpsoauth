@@ -9,19 +9,20 @@ module Gpsoauth
     "rwgi3iJIZdodyhKZQrNWp5nKJ3srRXcUW+F1BD3baEVGcmEgqaLZUNBjm057pKRI16kB0" \
     "YppeGx5qIQ5QjKzsR8ETQbKLNWgRY0QRNVz34kMJR3P/LgHax/6rmf5AAAAAwEAAQ==".b
 
-    def master_login(email, password, android_id,
-                     service = nil, device_country = nil,
-                     operator_country = nil, lang = nil, sdk_version = nil)
+    def initialize(android_id, service = nil, device_country = nil,
+                   operator_country = nil, lang = nil, sdk_version = nil)
 
-      @email = email
+      @android_id = "9774d56d682e549c" # @TODO Remove, client provided
+      # @android_id = android_id
+
       @service = service || "ac2dm"
-
       @device_country = device_country || "us"
       @operator_country = operator_country || "us"
       @lang = lang || "en"
       @sdk_version = sdk_version || 17
+    end
 
-      @android_id = "9774d56d682e549c" # @TODO Remove, client provided
+    def master_login(email, password)
       android_key = Google::key_from_b64(B64_KEY_7_3_29)
 
       data = {
@@ -31,20 +32,36 @@ module Gpsoauth
         add_account: 1,
         Passwd: password,
         # EncryptedPasswd: Google::signature(email, password, android_key), # @TODO
-        service: service,
+        service: @service,
         source: "android",
-        androidId: android_id,
-        device_country:  device_country,
-        operatorCountry: device_country,
-        lang: lang,
-        sdk_version: sdk_version
+        androidId: @android_id,
+        device_country:  @device_country,
+        operatorCountry: @operator_country,
+        lang: @lang,
+        sdk_version: @sdk_version
       }
 
       auth_request(data)
     end
 
-    def oauth(master_token, service, app, client_signature)
-      # @TODO
+    def oauth(email, master_token, service, app, client_signature)
+      data = {
+        accountType: "HOSTED_OR_GOOGLE",
+        Email: email,
+        has_permission: 1,
+        EncryptedPasswd: master_token,
+        source: "android",
+        androidId: @android_id,
+        device_country:  @device_country,
+        operatorCountry: @operator_country,
+        lang: @lang,
+        sdk_version: @sdk_version,
+        service: service,
+        app: app,
+        client_sig: client_signature
+      }
+
+      auth_request(data)
     end
 
     private

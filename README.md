@@ -24,17 +24,17 @@ And then execute:
 
 ## Usage
 
-Instantiate a Gpsoauth connection:
+Instantiate a Gpsoauth connection. This requires an Android ID:
 
-    g = Gpsoauth::Connection.new
+    g = Gpsoauth::Connection.new(android_id, [service, device_country, operator_country, lang, sdk_version])
 
-Perform 'master login'. This requires an Android ID:
+Perform 'master login' with email/password:
 
-    response = g.master_login('your-email@gmail.com', 'your-password', 'android id')
+    response = g.master_login(email, password)
 
 Use the response's token to perform the OAuth:
 
-    oauth_response = g.oauth(... // @TODO
+    oauth_response = g.oauth(email, response["Token"], service, app, client_signature)
 
 Access response Auth token via:
 
@@ -43,7 +43,6 @@ Access response Auth token via:
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/bryanmytko/gpsoauth. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 
 ## License
 
