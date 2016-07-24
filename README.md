@@ -1,5 +1,7 @@
 # Gpsoauth
 
+[![Gem Version](https://badge.fury.io/rb/gpsoauth.svg)](https://badge.fury.io/rb/gpsoauth)
+
 A Ruby client library for Google Play Services OAuth
 
 A port of the Python library [gpsoauth](https://github.com/simon-weber/gpsoauth) by [Simon Weber](https://github.com/simon-weber)
