@@ -18,8 +18,15 @@ module Gpsoauth
 
     def self.signature(email, password, key)
       signature = "\x00".bytes
-      struct = key_to_struct(key)
+      struct = key_to_struct(key).pack("c*")
       signature.push Digest::SHA1.hexdigest(struct)[0,4]
+
+      encrypted_login = key.public_encrypt(
+        email + "\x00" + password + OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING
+      )
+
+      a = Base64.urlsafe_encode64(signature + encrypted_login)
+      debugger
 
       # @TODO Encryptedpasswd notes:
       # http://codedigging.com/blog/2014-06-09-about-encryptedpasswd/
@@ -33,8 +40,9 @@ module Gpsoauth
     private
 
     def self.key_to_struct(key)
-      mod = key.n.to_s.bytes.map{ |x| x.to_s(16) }.join
-      exponent = key.e.to_s.bytes.map{ |x| x.to_s(16) }.join
+      #@TODO
+      mod = key.n.to_s.bytes
+      exponent = key.e.to_s.bytes
 
       "\x00\x00\x00\x80#{mod}\x00\x00\x00\x03#{exponent}".b
     end
