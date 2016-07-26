@@ -1,5 +1,5 @@
 module Gpsoauth
-  class Connection
+  class Client
     AUTH_URL = "https://android.clients.google.com/auth"
     USER_AGENT = "gpsoauth/gpsoauth"
 
@@ -30,8 +30,8 @@ module Gpsoauth
         has_permission: 1,
         add_account: 1,
         # @TODO Finish password encryption
-        # EncryptedPasswd: Google::signature(email, password, android_key)
-        Passwd: password,
+        EncryptedPasswd: Google::signature(email, password, android_key),
+        # Passwd: password,
         service: @service,
         source: "android",
         androidId: @android_id,
