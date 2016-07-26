@@ -26,9 +26,9 @@ Or install it yourself as:
 
 ## Usage
 
-Instantiate a Gpsoauth connection. This requires an Android ID:
+Instantiate a Gpsoauth client. This requires an Android ID:
 
-    g = Gpsoauth::Connection.new(android_id, [service, device_country, operator_country, lang, sdk_version])
+    g = Gpsoauth::Client.new(android_id, [service, device_country, operator_country, lang, sdk_version])
 
 Perform 'master login' with email/password:
 
