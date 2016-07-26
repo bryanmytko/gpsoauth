@@ -17,34 +17,43 @@ module Gpsoauth
     end
 
     def self.signature(email, password, key)
-      signature = "\x00".bytes
-      struct = key_to_struct(key).pack("c*")
-      signature.push Digest::SHA1.hexdigest(struct)[0,4]
+      # Encryption scheme deconstructed here:
+      # http://codedigging.com/blog/2014-06-09-about-encryptedpasswd/
 
-      encrypted_login = key.public_encrypt(
-        email + "\x00" + password + OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING
+      struct = key_to_struct(key).pack('c*')
+      first_four_bytes_sha1 = OpenSSL::Digest::SHA1.digest(struct)[0...4]
+
+      encrypted_login_password = key.public_encrypt(
+        email + "\x00" + password,
+        OpenSSL::PKey::RSA::PKCS1_OAEP_PADDING
       )
 
-      a = Base64.urlsafe_encode64(signature + encrypted_login)
-      debugger
-
-      # @TODO Encryptedpasswd notes:
-      # http://codedigging.com/blog/2014-06-09-about-encryptedpasswd/
-      #
-      # cipher = PKCS1_OAEP.new(key)
-      # encrypted_login = cipher.encrypt((email + u'\x00' + password).encode('utf-8'))
-      # signature.extend(encrypted_login)
-      # return base64.urlsafe_b64encode(signature)
+      signature = "\x00" + first_four_bytes_sha1 + encrypted_login_password
+      Base64.urlsafe_encode64(signature)
     end
 
     private
 
-    def self.key_to_struct(key)
-      #@TODO
-      mod = key.n.to_s.bytes
-      exponent = key.e.to_s.bytes
+    def self.long_to_bytes(key)
+      arr = []
+      key, mod = key.divmod(256)
 
-      "\x00\x00\x00\x80#{mod}\x00\x00\x00\x03#{exponent}".b
+      while mod > 0 || key > 0
+        arr << mod
+        key, mod = key.divmod(256)
+      end
+
+      arr = arr.reverse
+    end
+
+    def self.key_to_struct(key)
+      mod_buffer = "\x00\x00\x00\x80".unpack('C*')
+      exponent_buffer = "\x00\x00\x00\x03".unpack('C*')
+
+      mod = long_to_bytes(key.n.to_i)
+      exponent = long_to_bytes(key.e.to_i)
+
+      mod_buffer + mod + exponent_buffer + exponent
     end
   end
 end
