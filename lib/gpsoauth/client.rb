@@ -21,6 +21,15 @@ module Gpsoauth
       @sdk_version = sdk_version || 17
     end
 
+    def use_proxy(host, port, login = nil, password = nil)
+      @proxy_host = host
+      @proxy_port = port
+      @proxy_login = login
+      @proxy_password = password
+
+      return self
+    end
+
     def master_login(email, password)
       android_key = Google::key_from_b64(B64_KEY_7_3_29)
 
@@ -68,7 +77,11 @@ module Gpsoauth
       uri = URI(AUTH_URL)
 
       # Create client
-      http = Net::HTTP.new(uri.host, uri.port)
+      if @proxy_host && @proxy_port
+        http = Net::HTTP.new(uri.host, uri.port, @proxy_host, @proxy_port, @proxy_username, @proxy_password)
+      else
+        http = Net::HTTP.new(uri.host, uri.port)
+      end
       #http.set_debug_output $stdout
       http.use_ssl = true
       http.verify_mode = ::OpenSSL::SSL::VERIFY_NONE
