@@ -78,7 +78,7 @@ module Gpsoauth
 
       # Create client
       if @proxy_host && @proxy_port
-        http = Net::HTTP.new(uri.host, uri.port, @proxy_host, @proxy_port, @proxy_username, @proxy_password)
+        http = Net::HTTP.new(uri.host, uri.port, @proxy_host, @proxy_port, @proxy_login, @proxy_password)
       else
         http = Net::HTTP.new(uri.host, uri.port)
       end
