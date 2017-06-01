@@ -1,12 +1,13 @@
-require "httparty"
 require "base64"
+require 'json'
+require 'net/http'
+require 'net/https'
 
-require "gpsoauth/client"
-require "gpsoauth/exceptions"
-require "gpsoauth/google"
-require "gpsoauth/version"
+require_relative "gpsoauth/client"
+require_relative "gpsoauth/exceptions"
+require_relative "gpsoauth/google"
+require_relative "gpsoauth/version"
 
 module Gpsoauth
-  include HTTParty
   include Google
 end

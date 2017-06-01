@@ -47,7 +47,7 @@ module Gpsoauth
         accountType: "HOSTED_OR_GOOGLE",
         Email: email,
         has_permission: 1,
-        EncryptedPasswd: master_token,
+        Token: master_token,
         source: "android",
         androidId: @android_id,
         device_country:  @device_country,
@@ -65,16 +65,30 @@ module Gpsoauth
     private
 
     def auth_request(data)
-      options = {
-        body: data,
-        headers: {
-          "User-Agent" => USER_AGENT,
-          "Accept-Encoding" => ""
-        }
-      }
+      uri = URI(AUTH_URL)
 
-      response = HTTParty.post(AUTH_URL, options)
-      parse_auth_response(response)
+      # Create client
+      http = Net::HTTP.new(uri.host, uri.port)
+      #http.set_debug_output $stdout
+      http.use_ssl = true
+      http.verify_mode = ::OpenSSL::SSL::VERIFY_NONE
+      body = URI.encode_www_form(data)
+
+      # Create Request
+      req =  Net::HTTP::Post.new(uri)
+      # Add headers
+      req.add_field "User-Agent", USER_AGENT
+      # Add headers
+      req.add_field "Accept-Encoding", ""
+      # Add headers
+      #req.add_field "Content-Type", "application/json"
+      # Set body
+      req.body = body
+
+      # Fetch Request
+      res = http.request(req)
+
+      parse_auth_response(res.body)
     end
 
     def parse_auth_response(response)
