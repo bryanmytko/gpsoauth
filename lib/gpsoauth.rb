@@ -1,7 +1,7 @@
 require "base64"
-require 'json'
-require 'net/http'
-require 'net/https'
+require "json"
+require "net/http"
+require "net/https"
 
 require_relative "gpsoauth/client"
 require_relative "gpsoauth/exceptions"
