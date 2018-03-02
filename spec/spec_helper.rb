@@ -1,5 +1,6 @@
 require "bundler/setup"
 require "byebug"
+require "rspec/its"
 require "webmock/rspec"
 
 Bundler.setup

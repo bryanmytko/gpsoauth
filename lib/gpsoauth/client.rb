@@ -1,51 +1,58 @@
 module Gpsoauth
   class Client
-    AUTH_URL = "https://android.clients.google.com/auth"
-    USER_AGENT = "gpsoauth/gpsoauth"
+    ACCOUNT_TYPE = "HOSTED_OR_GOOGLE".freeze
+    ADD_ACCOUNT = 1
+    AUTH_URL = "https://android.clients.google.com/auth".freeze
+    PERMISSION = 1
+    SOURCE = "android".freeze
+    USER_AGENT = "gpsoauth/gpsoauth".freeze
 
-    # The key is distirbuted with Google Play Services.
-    # This one is from version 7.3.29.
-    B64_KEY_7_3_29 = "AAAAgMom/1a/v0lblO2Ubrt60J2gcuXSljGFQXgcyZWveWLEwo6p" \
-    "rwgi3iJIZdodyhKZQrNWp5nKJ3srRXcUW+F1BD3baEVGcmEgqaLZUNBjm057pKRI16kB0" \
-    "YppeGx5qIQ5QjKzsR8ETQbKLNWgRY0QRNVz34kMJR3P/LgHax/6rmf5AAAAAwEAAQ==".b
+    DEFAULT_DEVICE_COUNTRY = "us".freeze
+    DEFAULT_LANG = "en".freeze
+    DEFAULT_OPERATOR_COUNTRY = "us".freeze
+    DEFAULT_SDK_VERSION = 17
+    DEFAULT_SERVICE = "ac2dm".freeze
 
-    def initialize(android_id, service = nil, device_country = nil,
-                   operator_country = nil, lang = nil, sdk_version = nil)
+    attr_reader :android_id, :device_country, :lang, :operator_country,
+      :sdk_version, :service
+
+    attr_reader :proxy_host, :proxy_login, :proxy_password, :proxy_port
+
+    def initialize(android_id, device_country: nil, lang: nil,
+                   operator_country: nil, sdk_version: nil, service: nil)
 
       @android_id = android_id
-
-      @service = service || "ac2dm"
-      @device_country = device_country || "us"
-      @operator_country = operator_country || "us"
-      @lang = lang || "en"
-      @sdk_version = sdk_version || 17
+      @device_country = device_country || DEFAULT_DEVICE_COUNTRY
+      @lang = lang || DEFAULT_LANG
+      @operator_country = operator_country || DEFAULT_OPERATOR_COUNTRY
+      @sdk_version = sdk_version || DEFAULT_SDK_VERSION
+      @service = service || DEFAULT_SERVICE
     end
 
-    def use_proxy(host, port, login = nil, password = nil)
+    def use_proxy(host, port, login: nil, password: nil)
       @proxy_host = host
-      @proxy_port = port
       @proxy_login = login
       @proxy_password = password
-
-      return self
+      @proxy_port = port
     end
 
     def master_login(email, password)
-      android_key = Google::key_from_b64(B64_KEY_7_3_29)
+      android_key = Google::key_from_b64(Keys.default)
+      password = Google::signature(email, password, android_key)
 
       data = {
-        accountType: "HOSTED_OR_GOOGLE",
+        accountType: ACCOUNT_TYPE,
         Email: email,
-        has_permission: 1,
-        add_account: 1,
-        EncryptedPasswd: Google::signature(email, password, android_key),
-        service: @service,
-        source: "android",
-        androidId: @android_id,
-        device_country:  @device_country,
-        operatorCountry: @operator_country,
-        lang: @lang,
-        sdk_version: @sdk_version
+        has_permission: PERMISSION,
+        add_account: ADD_ACCOUNT,
+        EncryptedPasswd: password,
+        service: service,
+        source: SOURCE,
+        androidId: android_id,
+        device_country:  device_country,
+        operatorCountry: operator_country,
+        lang: lang,
+        sdk_version: sdk_version,
       }
 
       auth_request(data)
@@ -53,19 +60,19 @@ module Gpsoauth
 
     def oauth(email, master_token, service, app, client_signature)
       data = {
-        accountType: "HOSTED_OR_GOOGLE",
+        accountType: ACCOUNT_TYPE,
         Email: email,
-        has_permission: 1,
+        has_permission: PERMISSION,
         Token: master_token,
-        source: "android",
-        androidId: @android_id,
-        device_country:  @device_country,
-        operatorCountry: @operator_country,
-        lang: @lang,
-        sdk_version: @sdk_version,
+        source: SOURCE,
+        androidId: android_id,
+        device_country:  device_country,
+        operatorCountry: operator_country,
+        lang: lang,
+        sdk_version: sdk_version,
         service: service,
         app: app,
-        client_sig: client_signature
+        client_sig: client_signature,
       }
 
       auth_request(data)
@@ -75,33 +82,31 @@ module Gpsoauth
 
     def auth_request(data)
       uri = URI(AUTH_URL)
+      req_args = [uri.host, uri.port]
+      args = using_proxy? ? req_args + proxy_args : req_args
 
-      # Create client
-      if @proxy_host && @proxy_port
-        http = Net::HTTP.new(uri.host, uri.port, @proxy_host, @proxy_port, @proxy_login, @proxy_password)
-      else
-        http = Net::HTTP.new(uri.host, uri.port)
+      http = Net::HTTP.new(*args).tap do |h|
+        h.use_ssl = true
+        h.verify_mode = ::OpenSSL::SSL::VERIFY_NONE
       end
-      #http.set_debug_output $stdout
-      http.use_ssl = true
-      http.verify_mode = ::OpenSSL::SSL::VERIFY_NONE
-      body = URI.encode_www_form(data)
 
-      # Create Request
-      req =  Net::HTTP::Post.new(uri)
-      # Add headers
-      req.add_field "User-Agent", USER_AGENT
-      # Add headers
-      req.add_field "Accept-Encoding", ""
-      # Add headers
-      #req.add_field "Content-Type", "application/json"
-      # Set body
-      req.body = body
+      request = Net::HTTP::Post.new(uri).tap do |r|
+        r.add_field "User-Agent", USER_AGENT
+        r.add_field "Accept-Encoding", ""
+        r.body = URI.encode_www_form(data)
+      end
 
-      # Fetch Request
-      res = http.request(req)
+      response = http.request(request)
 
-      parse_auth_response(res.body)
+      parse_auth_response(response.body)
+    end
+
+    def proxy_args
+      %w(proxy_host proxy_port proxy_login proxy_password)
+    end
+
+    def using_proxy?
+      proxy_host && proxy_port
     end
 
     def parse_auth_response(response)

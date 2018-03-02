@@ -6,6 +6,16 @@ describe Gpsoauth::Client do
   let(:host) { "127.0.0.1" }
   let(:port) { 8080 }
 
+  describe "#initialize" do
+    context "created with defaults" do
+      its(:device_country) { should eq(described_class::DEFAULT_DEVICE_COUNTRY) }
+      its(:lang) { should eq(described_class::DEFAULT_LANG) }
+      its(:operator_country) { should eq(described_class::DEFAULT_OPERATOR_COUNTRY) }
+      its(:sdk_version) { should eq(described_class::DEFAULT_SDK_VERSION) }
+      its(:service) { should eq(described_class::DEFAULT_SERVICE) }
+    end
+  end
+
   describe "#use_proxy" do
     it "uses proxy" do
       subject.use_proxy(host, port)
