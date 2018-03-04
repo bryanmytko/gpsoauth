@@ -5,6 +5,9 @@ describe Gpsoauth::Client do
   let(:id) { "9774d56d682e549c" }
   let(:host) { "127.0.0.1" }
   let(:port) { 8080 }
+  let(:email) { "billclinton@gmail.com" }
+  let(:password) { "password" }
+  let(:oauth_args) { %w(foo bar bat baz) }
 
   describe "#initialize" do
     context "created with defaults" do
@@ -25,9 +28,16 @@ describe Gpsoauth::Client do
   end
 
   describe "#master_login" do
-    it "provides token" do
-      response = subject.master_login("billclinton@gmail.com", "password")
+    it "provides a token" do
+      response = subject.master_login(email, password)
       expect(response["Token"]).to eq("aaa")
+    end
+  end
+
+  describe "#oauth" do
+    it "provides a token" do
+      response = subject.oauth(email, *oauth_args)
+      expect(response["Auth"]).to eq("FQUb.")
     end
   end
 end
