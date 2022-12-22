@@ -3,7 +3,7 @@ module Gpsoauth
     AUTH_URL = "https://android.clients.google.com/auth"
     USER_AGENT = "gpsoauth/gpsoauth"
 
-    # The key is distirbuted with Google Play Services.
+    # The key is distributed with Google Play Services.
     # This one is from version 7.3.29.
     B64_KEY_7_3_29 = "AAAAgMom/1a/v0lblO2Ubrt60J2gcuXSljGFQXgcyZWveWLEwo6p" \
     "rwgi3iJIZdodyhKZQrNWp5nKJ3srRXcUW+F1BD3baEVGcmEgqaLZUNBjm057pKRI16kB0" \
