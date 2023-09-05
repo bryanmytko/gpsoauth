@@ -10,8 +10,9 @@ module Gpsoauth
       exponent = binary_key[i + 8, j].unpack("H*")[0].to_i(16)
 
       key = OpenSSL::PKey::RSA.new
-      key.e = OpenSSL::BN.new(exponent)
-      key.n = OpenSSL::BN.new(mod)
+      n = OpenSSL::BN.new(mod)
+      e = OpenSSL::BN.new(exponent)
+      key.set_key(n, e, nil)
 
       key
     end
